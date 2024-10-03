@@ -14,13 +14,14 @@ router.post('/createuser', [
     body('password').isLength({min: 5}),
     body('email').isEmail()
 ], async(req, res) =>{
-
+    let success = false;
     // if there are errors,return bad request and the errors
     const result = validationResult(req);
+    console.log(result);
     if (!result.isEmpty()) {
-        return res.send(`Hello, ${req.query.person}!`);
+        return res.send(`He, ${req.query.person}!`);
     }
-   
+//    console.log(result)
     try{
          // check whether the user with this email exists already
     let user =  await User.findOne({email: req.body.email});
@@ -43,8 +44,8 @@ router.post('/createuser', [
         }
     }
     const authToken = jwt.sign(data, JWT_SECRET);
-   
-    res.json({authToken})
+   success = true;
+    res.json({success, authToken})
     // catch errors
     } catch(error){
         console.log(error.message);
@@ -59,10 +60,10 @@ router.post('/login',[
     body('email').isEmail(),
     body('password').exists(),
 ], async(req, res) =>{
-
+    let success = false;
     const result = validationResult(req);
     if (!result.isEmpty()) {
-        return res.send(`Hello, ${req.query.person}!`);
+        return res.send(`H, ${req.query.person}!`);
     }
 
     // extract email and password
@@ -71,10 +72,12 @@ router.post('/login',[
     try{
         let user = await User.findOne({email});
             if(!user){
+                success = false;
                 return res.status(400).json({error: 'pls try an auth'});
             }
         const passwordcompare = await bcrypt.compare(password, user.password);
         if(!passwordcompare){
+            success = false;
             return res.status(400).json({error: 'pls try as auth'});
         }
 
@@ -84,8 +87,8 @@ router.post('/login',[
             }
         }
         const authToken = jwt.sign(data, JWT_SECRET);
-   
-        res.json({authToken})
+        success = true;
+        res.json({success, authToken})
 
     } catch(error){
         console.error(error.message);
@@ -99,7 +102,9 @@ router.post('/getuser',fetchuser, async(req, res) =>{
 
 try {
     userId = req.user.id;
-    const user = await User.findById(userId).select("-password")
+    console.log(userId)
+    console.log("first")
+    const user = await User.findById(userId).select("-email")
     res.send(user)
 } catch (error) {
     console.error(error.message);

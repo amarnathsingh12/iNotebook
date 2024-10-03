@@ -1,15 +1,19 @@
-import React, {useEffect} from 'react'
-import { Link , useLocation} from "react-router-dom";
+import React, { useEffect } from 'react'
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 // all a replace with Link and href with to
 
 const Navbar = () => {
-
+    let navigate = useNavigate();
+    const handlelogout = () =>{
+        localStorage.removeItem('token');
+        navigate("/login");
+    }
     // it is used in make home or about to make dark when cursor points otherwise same
     let location = useLocation();
     useEffect(() => {
-        console.log(location);
-      }, [location]);
+        // console.log(location);
+    }, [location]);
     return (
         <div>
             <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -22,16 +26,15 @@ const Navbar = () => {
                 <div className="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul className="navbar-nav mr-auto">
                         <li className="nav-item active">
-                            <Link className={`nav-link ${location.pathname==="/"? "active":""}`} to="/">Home </Link>
+                            <Link className={`nav-link ${location.pathname === "/" ? "active" : ""}`} to="/">Home </Link>
                         </li>
                         <li className="nav-item">
-                            <Link className={`nav-link ${location.pathname==="/about"? "active":""}`} to="/about">About</Link>
+                            <Link className={`nav-link ${location.pathname === "/about" ? "active" : ""}`} to="/about">About</Link>
                         </li>
                     </ul>
-                    <form className="form-inline my-2 my-lg-0">
-                        <input className="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" />
-                        <button className="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-                    </form>
+                    {!localStorage.getItem('token') ? <form className='d-flex'>
+                    <Link role='button' to="/Signup" style={{ margin: "8px"}} className="btn btn-primary">SignUp</Link>
+                    <Link role='button' to="/Login" style={{ margin: "8px"}} className="btn btn-primary">Login</Link></form> : <button onClick={handlelogout} className='btn btn-primary'>Logout</button>}
                 </div>
             </nav>
         </div>
